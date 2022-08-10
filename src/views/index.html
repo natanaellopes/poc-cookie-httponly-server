@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POC - Cookie HttpOnly - Server</title>
+</head>
+<body>
+  
+  <div>
+    <h1>POC - Cookie HttpOnly - Server</h1>
+    <button type="button" id="btn-auth">Autenticar-se</button>
+    <button type="button" id="btn-create-cookie">Criar cookie</button>
+    <button type="button" id="btn-check-cookies">Verificar cookies (api)</button>
+    <button type="button" id="btn-print-cookies">Imprimir cookies (local)</button>
+  </div>
+
+  <script>
+    const btnAuth = document.getElementById('btn-auth');
+    const btnCheckCookies = document.getElementById('btn-check-cookies');
+    const btnCreateCookie = document.getElementById('btn-create-cookie');
+    const btnPrintCookies = document.getElementById('btn-print-cookies');
+    
+    const requester = async (url, method = 'GET', include = 'none') => {
+      try {
+        const response = await fetch(`http://localhost:3333${url}`, {
+          method: method,
+          include,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        const data = await response.json();
+
+        console.log(method, url, data);
+    
+        return data;
+      } catch(e) {
+        console.error(e)
+      }
+      
+    }
+
+    btnAuth.addEventListener('click', () => requester('/token', 'POST'));
+
+    btnCheckCookies.addEventListener('click', () => requester('/cookies', 'GET', 'include'));
+
+    btnCreateCookie.addEventListener('click', () => {
+      document.cookie = `cookie-${Date.now()}=${generateUUID()}`;
+    })
+
+    btnPrintCookies.addEventListener('click', () => {
+      const cookies = document.cookie;
+
+      if(!cookies) {
+        console.log('Nenhum cookie encontrado');
+        return;
+      }
+
+      const parsedCookies = cookies.split('; ');
+      let cookiesObject = {};
+
+      parsedCookies.forEach(cookie => {
+        const [key, value] = cookie.split('=');
+        cookiesObject = { ...cookiesObject, [key]: value };
+      });
+
+      console.log('document.cookies', cookiesObject);
+
+    });
+
+    function generateUUID() { // Public Domain/MIT
+      var d = new Date().getTime(); //Timestamp
+      var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0; //Time in microseconds since page-load or 0 if unsupported
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16;//random number between 0 and 16
+          if(d > 0){ //Use timestamp until depleted
+              r = (d + r)%16 | 0;
+              d = Math.floor(d/16);
+          } else { //Use microseconds since page-load if supported
+              r = (d2 + r)%16 | 0;
+              d2 = Math.floor(d2/16);
+          }
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+    
+  </script>
+
+</body>
+</html>
