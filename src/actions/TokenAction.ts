@@ -8,7 +8,8 @@ const TokenAction = async (_req: Request, res: Response): Promise<any> => {
     maxAge: 1000 * 60 * 15, // 15 min
     httpOnly: true,
     secure: true,
-    sameSite: 'lax',
+    sameSite: 'none',
+    domain: 'localhost',
   });
 
   return res.json({ token });

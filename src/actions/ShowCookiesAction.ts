@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 const ShowCookiesAction = async (req: Request, res: Response): Promise<any> => {
   const cookies = req.headers.cookie;
 
+  console.log(cookies)
+
   if(!cookies) {
     return res.json({ success: false });
   }
