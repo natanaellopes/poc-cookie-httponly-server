@@ -8,9 +8,7 @@ const app = express();
 
 const port = process.env.PORT || 3333;
 
-app.use(cors({credentials: true, origin: (_origin, callback) => {
-  return callback(null, true);
-}}));
+app.use(cors());
 
 app.use(cookieParser());
 app.use(express.json());
